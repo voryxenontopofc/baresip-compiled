@@ -15,3 +15,6 @@ the build script is located in `code.yml` (made with ai).
 
 ### credits / upstream
 original repo and docs: https://github.com/baresip/baresip
+
+### i get smartscreen warning, is this a virus?
+no. smartscreen is telling you that the .exe is a virus because the .exe is not digitally signed. as i said, you can inspect the code.yml file to see that it uses the official baresip repo to compile the file.
