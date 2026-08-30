@@ -1,0 +1,73 @@
+name: Build Baresip Windows
+
+on:
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            make
+            ninja
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-speexdsp
+            mingw-w64-x86_64-libsndfile
+
+      - name: Build Libre (re)
+        shell: msys2 {0}
+        run: |
+          git clone --depth 1 https://github.com/baresip/re.git
+          cd re
+          mkdir build && cd build
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX=/mingw64 -DCMAKE_BUILD_TYPE=Release ..
+          ninja
+          ninja install
+
+      - name: Build Librem (rem)
+        shell: msys2 {0}
+        run: |
+          git clone --depth 1 https://github.com/baresip/rem.git
+          cd rem
+          mkdir build && cd build
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX=/mingw64 -DCMAKE_BUILD_TYPE=Release ..
+          ninja
+          ninja install
+
+      - name: Build Baresip
+        shell: msys2 {0}
+        run: |
+          git clone --depth 1 https://github.com/baresip/baresip.git
+          cd baresip
+          mkdir build && cd build
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX=/mingw64 -DCMAKE_BUILD_TYPE=Release -DSTATIC=ON ..
+          ninja
+
+      - name: Package Executable and DLLs
+        shell: msys2 {0}
+        run: |
+          mkdir -p output
+          cp baresip/build/baresip.exe output/
+          
+          # Copy essential MingW and OpenSSL DLLs into the same package
+          cp /mingw64/bin/libssl-*.dll output/ 2>/dev/null || true
+          cp /mingw64/bin/libcrypto-*.dll output/ 2>/dev/null || true
+          cp /mingw64/bin/libwinpthread-1.dll output/ 2>/dev/null || true
+          cp /mingw64/bin/libgcc_s_seh-1.dll output/ 2>/dev/null || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: baresip-windows-x64
+          path: output/
