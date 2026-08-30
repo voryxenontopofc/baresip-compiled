@@ -1,6 +1,17 @@
-# baresip-compiled
+# baresip-compiled (Windows x64)
 
-yeah its just baresip but its compiled for windows.
-the compile was made using github actions.
-**the code for the runner is available in the code.yml file.** (it was made by ai)
-link to the original repo: https://github.com/baresip/baresip
+pre-compiled `baresip.exe` for 64-bit windows with TLS/OpenSSL support.
+
+built automatically from source using github actions so you don't have to deal with msys2/compiling.
+
+### how to get it
+1. go to the **Actions** tab.
+2. click the latest **Build Baresip Windows** run.
+3. scroll down to **Artifacts** and download `baresip-windows-x64.zip`.
+4. extract the `.exe` and the `.dll` files into your project folder.
+
+### workflow
+the build script is located in `code.yml` (made with ai).
+
+### credits / upstream
+original repo and docs: https://github.com/baresip/baresip
